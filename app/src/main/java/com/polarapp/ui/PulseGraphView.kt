@@ -2,13 +2,14 @@ package com.polarapp.ui
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import kotlin.math.max
+import androidx.core.content.ContextCompat
+import com.polarapp.R
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.max
 
 class PulseGraphView @JvmOverloads constructor(
     context: Context,
@@ -17,20 +18,20 @@ class PulseGraphView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#1976D2")
+        color = ContextCompat.getColor(context, R.color.pulse_line)
         strokeWidth = 6f
         style = Paint.Style.STROKE
     }
 
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#CCCCCC")
+        color = ContextCompat.getColor(context, R.color.pulse_grid)
         strokeWidth = 1f
         style = Paint.Style.STROKE
         alpha = 80
     }
 
     private val axisPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.DKGRAY
+        color = ContextCompat.getColor(context, R.color.pulse_axis)
         strokeWidth = 2f
         style = Paint.Style.STROKE
         textSize = 28f
