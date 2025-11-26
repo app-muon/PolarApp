@@ -4,7 +4,6 @@ import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var api: PolarBleApi
     private val disposables = CompositeDisposable()
 
-    private lateinit var deviceIdInput: EditText
+    private lateinit var deviceIdField: TextView
     private lateinit var scanButton: Button
     private lateinit var connectButton: Button
     private lateinit var statusText: TextView
@@ -28,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var hrMax: TextView
     private lateinit var hrMin: TextView
     private lateinit var pulseGraph: PulseGraphView
+    private lateinit var resetButton: Button
 
     private var sessionStartMs: Long = 0L
     private var currentHr: Int? = null
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        deviceIdInput = findViewById(R.id.deviceIdInput)
+        deviceIdField = findViewById(R.id.deviceIdInput)
         scanButton = findViewById(R.id.scanButton)
         connectButton = findViewById(R.id.connectButton)
         statusText = findViewById(R.id.statusText)
@@ -56,6 +56,8 @@ class MainActivity : AppCompatActivity() {
         hrMax = findViewById(R.id.hrMax)
         hrMin = findViewById(R.id.hrMin)
         pulseGraph = findViewById(R.id.pulseGraph)
+        resetButton = findViewById(R.id.resetButton)
+        resetButton.setOnClickListener { resetSession() }
 
         api = PolarBleApiDefaultImpl.defaultImplementation(
             applicationContext,
@@ -79,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         }
         permissionLauncher.launch(permissions.toTypedArray())
 
-        statusText.text = "Scanning for Polar devices..."
+        statusText.text = getString(R.string.scanning_for_polar_devices)
 
         // Listen for the first broadcast and use its deviceId
         val d = api.startListenForPolarHrBroadcasts(null)
@@ -88,10 +90,11 @@ class MainActivity : AppCompatActivity() {
             .subscribe({ data ->
                 val foundId = data.polarDeviceInfo.deviceId
                 selectedDeviceId = foundId
-                deviceIdInput.setText(foundId)
-                statusText.text = "Found device $foundId. Tap Connect to use this device."
+                deviceIdField.text = foundId
+                statusText.text =
+                    getString(R.string.found_device_tap_connect_to_use_this_device, foundId)
             }, { error ->
-                statusText.text = "Scan error: ${error.message}"
+                statusText.text = getString(R.string.scan_error, error.message)
             })
         disposables.add(d)
     }
@@ -109,7 +112,8 @@ class MainActivity : AppCompatActivity() {
     private fun onHeartRate(hr: Int) {
         runOnUiThread {
             if (currentHr == null) {
-                statusText.text = "Receiving HR from ${selectedDeviceId ?: "device"}"
+                statusText.text =
+                    getString(R.string.receiving_hr_from, selectedDeviceId ?: "device")
                 resetSession()
             }
             currentHr = hr
@@ -123,16 +127,16 @@ class MainActivity : AppCompatActivity() {
             }
             hrBins[binIndex] = hr
 
-            hrText.text = "$hr bpm"
+            hrText.text = getString(R.string.bpm2, hr)
             updateStatsUi()
             pulseGraph.setData(hrBins.toList())
         }
     }
 
     private fun updateStatsUi() {
-        hrCurrent.text = "Now: ${currentHr?.toString() ?: "--"}"
-        hrMax.text = "Max: ${maxHr?.toString() ?: "--"}"
-        hrMin.text = "Min: ${minHr?.toString() ?: "--"}"
+        hrCurrent.text = getString(R.string.now2, currentHr?.toString() ?: "--")
+        hrMax.text = getString(R.string.max2, maxHr?.toString() ?: "--")
+        hrMin.text = getString(R.string.min2, minHr?.toString() ?: "--")
     }
 
     private fun ensurePermissionsAndConnect() {
@@ -145,34 +149,26 @@ class MainActivity : AppCompatActivity() {
         }
         permissionLauncher.launch(permissions.toTypedArray())
 
-        val idFromField = deviceIdInput.text.toString().trim()
-        val id = when {
-            selectedDeviceId != null -> selectedDeviceId
-            idFromField.isNotEmpty() -> idFromField
-            else -> null
-        }
+        val id = selectedDeviceId
 
         if (id == null) {
-            statusText.text = "Scan to find a device, then tap Connect."
+            statusText.text = getString(R.string.scan_to_find_a_device_then_tap_connect)
             return
         }
 
-        selectedDeviceId = id
-        statusText.text = "Connecting to $id"
+        statusText.text = getString(R.string.connecting_to, id)
 
         runCatching { api.connectToDevice(id) }
             .onFailure { e ->
                 runOnUiThread {
-                    statusText.text = "Error connecting to $id: ${e.message}"
+                    statusText.text = getString(R.string.error_connecting_to, id, e.message)
                 }
             }
 
-        // Clear previous HR subscriptions but keep api alive
         disposables.clear()
 
         val targetId = id
 
-        // Listen to broadcasts from all devices, but accept only our selected one
         val d = api.startListenForPolarHrBroadcasts(null)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ data ->
@@ -181,7 +177,7 @@ class MainActivity : AppCompatActivity() {
                     onHeartRate(data.hr)
                 }
             }, { error ->
-                statusText.text = "HR error: ${error.message}"
+                statusText.text = getString(R.string.hr_error, error.message)
             })
         disposables.add(d)
     }

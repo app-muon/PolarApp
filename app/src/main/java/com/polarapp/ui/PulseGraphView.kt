@@ -6,6 +6,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import kotlin.math.max
+import kotlin.math.ceil
+import kotlin.math.floor
 
 class PulseGraphView @JvmOverloads constructor(
     context: Context,
@@ -23,7 +26,7 @@ class PulseGraphView @JvmOverloads constructor(
         color = Color.parseColor("#CCCCCC")
         strokeWidth = 1f
         style = Paint.Style.STROKE
-        alpha = 80   // faint
+        alpha = 80
     }
 
     private val axisPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -46,7 +49,6 @@ class PulseGraphView @JvmOverloads constructor(
         val w = width.toFloat()
         val h = height.toFloat()
 
-        // Layout paddings
         val leftPad = 64f
         val rightPad = 8f
         val topPad = 16f
@@ -56,7 +58,6 @@ class PulseGraphView @JvmOverloads constructor(
         val plotH = h - topPad - bottomPad
         if (plotW <= 0f || plotH <= 0f) return
 
-        // HR axis range
         val hrMin = 60
         val hrMax = 180
         val hrRange = (hrMax - hrMin).toFloat()
@@ -73,43 +74,65 @@ class PulseGraphView @JvmOverloads constructor(
             canvas.drawLine(leftPad, y, leftPad + plotW, y, gridPaint)
         }
 
-        // Y-axis labels at 60, 100, 140, 180
+        // Y-axis labels 60, 100, 140, 180
         val labelValues = listOf(60, 100, 140, 180)
         for (label in labelValues) {
             val y = hrToY(label)
             canvas.drawText(label.toString(), 8f, y + axisPaint.textSize / 2f, axisPaint)
         }
 
-        // X-axis line
         val axisY = topPad + plotH
         canvas.drawLine(leftPad, axisY, leftPad + plotW, axisY, axisPaint)
 
         if (bins.isEmpty()) return
 
-        // Polyline + X-axis ticks (minutes, assuming 5s per bin)
         val totalPoints = bins.size
         val stepX = if (totalPoints <= 1) 0f else plotW / (totalPoints - 1)
 
-        // Minute ticks and optional vertical grid
-        if (totalPoints > 1) {
-            val secondsPerBin = 5f
-            val minutesPerBin = secondsPerBin / 60f
+        // ---- X-AXIS LABELS: MAX 6, INTEGER MINUTES, WITH VERTICAL LINES ----
+        val secondsPerBin = 5f
+        val totalSeconds = totalPoints * secondsPerBin
+        val totalMinutesFloat = totalSeconds / 60f
+        val totalMinutesInt = floor(totalMinutesFloat).toInt()
 
-            for (i in 0 until totalPoints) {
-                val minutes = i * minutesPerBin
-                if (minutes % 1f == 0f) { // whole minutes
-                    val x = leftPad + i * stepX
-                    // vertical faint line
+        if (totalMinutesInt >= 0) {
+            val maxLabels = 6
+            val spanMinutes = max(1, totalMinutesInt)
+            var stepMinutes = ceil(spanMinutes / maxLabels.toFloat()).toInt()
+            if (stepMinutes < 1) stepMinutes = 1
+
+            // Always include 0m
+            var minute = 0
+            while (minute <= totalMinutesInt) {
+                val index = ((minute * 60f) / secondsPerBin).toInt()
+                if (index in 0 until totalPoints) {
+                    val x = leftPad + index * stepX
+
+                    // Vertical grid line at this minute
                     canvas.drawLine(x, topPad, x, axisY, gridPaint)
 
-                    val label = "${minutes.toInt()}m"
+                    val label = "${minute}m"
+                    val textWidth = axisPaint.measureText(label)
+                    canvas.drawText(label, x - textWidth / 2f, h - 4f, axisPaint)
+                }
+                minute += stepMinutes
+            }
+
+            // Ensure last minute label if we don't already land on it and it’s > 0
+            if (totalMinutesInt > 0 && totalMinutesInt % stepMinutes != 0) {
+                val lastIndex = ((totalMinutesInt * 60f) / secondsPerBin).toInt()
+                if (lastIndex in 0 until totalPoints) {
+                    val x = leftPad + lastIndex * stepX
+                    canvas.drawLine(x, topPad, x, axisY, gridPaint)
+                    val label = "${totalMinutesInt}m"
                     val textWidth = axisPaint.measureText(label)
                     canvas.drawText(label, x - textWidth / 2f, h - 4f, axisPaint)
                 }
             }
         }
+        // -------------------------------------------------------------------
 
-        // Draw HR line
+        // HR polyline
         var prevX = leftPad
         var prevY = hrToY(bins[0])
 

@@ -1,5 +1,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
     <style name="Theme.PolarApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- App primary colours -->
+        <item name="colorPrimary">#001F3F</item>
+        <item name="colorPrimaryVariant">#001F3F</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <!-- Status bar -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+
+        <!-- Make all standard Buttons navy with white text -->
+        <item name="buttonStyle">@style/Widget.PolarApp.Button</item>
     </style>
+
+    <style name="Widget.PolarApp.Button" parent="Widget.AppCompat.Button">
+        <item name="android:backgroundTint">#001F3F</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
 </resources>

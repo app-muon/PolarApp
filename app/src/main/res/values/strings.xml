@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scan">Scan</string>
+    <string name="connect">Connect</string>
+    <string name="polar_device_id">Polar device ID</string>
+    <string name="status_idle">Status: Idle</string>
+    <string name="now">Now: —</string>
+    <string name="max">Max: —</string>
+    <string name="min">Min: —</string>
+    <string name="bpm">-- bpm</string>
+    <string name="reset">Reset</string>
+    <string name="scanning_for_polar_devices">Scanning for Polar devices…</string>
+    <string name="scan_to_find_a_device_then_tap_connect">Scan to find a device, then tap Connect.</string>
+    <string name="connecting_to">Connecting to %1$s</string>
+    <string name="error_connecting_to">Error connecting to %1$s: %2$s</string>
+    <string name="hr_error">HR error: %1$s</string>
+    <string name="bpm2">%1$d bpm</string>
+    <string name="receiving_hr_from">Receiving HR from %1$s</string>
+    <string name="scan_error">Scan error: %1$s</string>
+    <string name="found_device_tap_connect_to_use_this_device">Found device %1$s. Tap Connect to use this device.</string>
+    <string name="now2">Now: %1$s</string>
+    <string name="max2">Max: %1$s</string>
+    <string name="min2">Min: %1$s</string>
+</resources>
