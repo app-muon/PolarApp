@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -8,12 +9,13 @@
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:orientation="horizontal"
-        android:layout_marginTop="6dp">
+        android:fitsSystemWindows="true"
+        tools:ignore="ButtonStyle">
 
         <Button
             android:id="@+id/scanButton"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -21,7 +23,6 @@
 
         <Button
             android:id="@+id/connectButton"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -32,43 +33,46 @@
         android:id="@+id/deviceIdInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="16sp"
-        android:padding="8dp"
         android:background="@android:color/transparent"
+        android:hint="@string/polar_device_id"
+        android:padding="8dp"
+        android:text=""
         android:textColor="#000000"
-        android:hint="@string/polar_device_id" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/statusText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/status_idle"
-        android:paddingTop="8dp" />
+        android:paddingTop="8dp"
+        android:text="@string/status_idle" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingTop="8dp">
+
         <TextView
             android:id="@+id/hrCurrent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/now" />
+            android:text="@string/stat_now" />
+
         <TextView
             android:id="@+id/hrMax"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/max" />
+            android:text="@string/stat_max" />
+
         <TextView
             android:id="@+id/hrMin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/min" />
+            android:text="@string/stat_min" />
     </LinearLayout>
 
     <com.polarapp.ui.PulseGraphView
@@ -81,16 +85,15 @@
         android:id="@+id/hrText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="48sp"
-        android:textStyle="bold"
-        android:text="@string/bpm"
+        android:layout_marginTop="12dp"
         android:gravity="center"
-        android:layout_marginTop="12dp" />
+        android:text="@string/bpm"
+        android:textSize="48sp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/resetButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/reset"
-        />
+        android:text="@string/reset" />
 </LinearLayout>

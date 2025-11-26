@@ -9,9 +9,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiDefaultImpl
+import com.polarapp.ui.PulseGraphView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import com.polarapp.ui.PulseGraphView
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var hrMin: TextView
     private lateinit var pulseGraph: PulseGraphView
     private lateinit var resetButton: Button
+    private var isConnected: Boolean = false
 
     private var sessionStartMs: Long = 0L
     private var currentHr: Int? = null
@@ -68,7 +69,13 @@ class MainActivity : AppCompatActivity() {
         )
 
         scanButton.setOnClickListener { ensurePermissionsAndScan() }
-        connectButton.setOnClickListener { ensurePermissionsAndConnect() }
+        connectButton.setOnClickListener {
+            if (isConnected) {
+                disconnectFromCurrentDevice()
+            } else {
+                ensurePermissionsAndConnect()
+            }
+        }
     }
 
     private fun ensurePermissionsAndScan() {
@@ -114,6 +121,8 @@ class MainActivity : AppCompatActivity() {
             if (currentHr == null) {
                 statusText.text =
                     getString(R.string.receiving_hr_from, selectedDeviceId ?: "device")
+                isConnected = true
+                connectButton.text = getString(R.string.disconnect)
                 resetSession()
             }
             currentHr = hr
@@ -134,9 +143,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateStatsUi() {
-        hrCurrent.text = getString(R.string.now2, currentHr?.toString() ?: "--")
-        hrMax.text = getString(R.string.max2, maxHr?.toString() ?: "--")
-        hrMin.text = getString(R.string.min2, minHr?.toString() ?: "--")
+        hrCurrent.text = getString(R.string.stat_now, currentHr?.toString() ?: "—")
+        hrMax.text = getString(R.string.stat_max, maxHr?.toString() ?: "—")
+        hrMin.text = getString(R.string.stat_min, minHr?.toString() ?: "—")
     }
 
     private fun ensurePermissionsAndConnect() {
@@ -180,6 +189,19 @@ class MainActivity : AppCompatActivity() {
                 statusText.text = getString(R.string.hr_error, error.message)
             })
         disposables.add(d)
+    }
+
+    private fun disconnectFromCurrentDevice() {
+        val id = selectedDeviceId
+        if (id != null) {
+            runCatching { api.disconnectFromDevice(id) }
+        }
+        isConnected = false
+        selectedDeviceId = null
+        connectButton.text = getString(R.string.connect)
+        statusText.text = getString(R.string.disconnected)
+        disposables.clear()
+        resetSession()
     }
 
     override fun onDestroy() {
