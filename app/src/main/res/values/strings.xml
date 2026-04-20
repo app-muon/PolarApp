@@ -18,6 +18,6 @@
     <string name="bpm">-- bpm</string>
     <string name="reset">Reset</string>
     <string name="hr_error">HR error: %1$s</string>
-    <string name="bpm2">%1$d bpm</string>
+    <string name="bpm_format">%1$d bpm</string>
     <string name="receiving_hr_from">Receiving HR from %1$s</string>
- </resources>
+</resources>

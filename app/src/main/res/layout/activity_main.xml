@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,7 +12,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:orientation="horizontal"
-        android:fitsSystemWindows="true"
         tools:ignore="ButtonStyle">
 
         <Button
@@ -30,14 +30,14 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/deviceIdInput"
+        android:id="@+id/deviceIdText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:hint="@string/polar_device_id"
         android:padding="8dp"
         android:text=""
-        android:textColor="#000000"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp" />
 
     <TextView
@@ -57,22 +57,19 @@
             android:id="@+id/hrCurrent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/stat_now" />
+            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/hrMax"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/stat_max" />
+            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/hrMin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/stat_min" />
+            android:layout_weight="1" />
     </LinearLayout>
 
     <com.polarapp.ui.PulseGraphView

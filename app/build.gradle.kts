@@ -45,6 +45,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
 
+
     // Polar BLE SDK (from JitPack)
     implementation("com.github.polarofficial:polar-ble-sdk:6.7.0")
 

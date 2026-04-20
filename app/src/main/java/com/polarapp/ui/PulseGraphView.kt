@@ -59,8 +59,11 @@ class PulseGraphView @JvmOverloads constructor(
         val plotH = h - topPad - bottomPad
         if (plotW <= 0f || plotH <= 0f) return
 
-        val hrMin = 60
-        val hrMax = 180
+        // Dynamic Y-axis: defaults to 60–180 but expands to fit out-of-range data
+        val rawMin = if (bins.isEmpty()) 60 else bins.min()
+        val rawMax = if (bins.isEmpty()) 180 else bins.max()
+        val hrMin = minOf(60, (rawMin / 20) * 20)
+        val hrMax = maxOf(180, ((rawMax + 19) / 20) * 20)
         val hrRange = (hrMax - hrMin).toFloat()
 
         fun hrToY(hr: Int): Float {
@@ -75,11 +78,10 @@ class PulseGraphView @JvmOverloads constructor(
             canvas.drawLine(leftPad, y, leftPad + plotW, y, gridPaint)
         }
 
-        // Y-axis labels 60, 100, 140, 180
-        val labelValues = listOf(60, 100, 140, 180)
-        for (label in labelValues) {
-            val y = hrToY(label)
-            canvas.drawText(label.toString(), 8f, y + axisPaint.textSize / 2f, axisPaint)
+        // Y-axis labels every 40 bpm
+        for (bpm in hrMin..hrMax step 40) {
+            val y = hrToY(bpm)
+            canvas.drawText(bpm.toString(), 8f, y + axisPaint.textSize / 2f, axisPaint)
         }
 
         val axisY = topPad + plotH
@@ -119,7 +121,7 @@ class PulseGraphView @JvmOverloads constructor(
                 minute += stepMinutes
             }
 
-            // Ensure last minute label if we don't already land on it and it’s > 0
+            // Ensure last minute label if we don't already land on it and it's > 0
             if (totalMinutesInt > 0 && totalMinutesInt % stepMinutes != 0) {
                 val lastIndex = ((totalMinutesInt * 60f) / secondsPerBin).toInt()
                 if (lastIndex in 0 until totalPoints) {
